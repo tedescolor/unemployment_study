@@ -1,10 +1,15 @@
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load("quantreg","dplyr","doParallel","foreach",
-               "abind")
+# if (!require("pacman")) install.packages("pacman")
+# pacman::p_load("quantreg","dplyr","doParallel","foreach",
+#                "abind")
+list.of.packages <- c("ggplot2", "Rcpp","survival","quantreg","dplyr","doParallel","foreach",
+                                                    "abind" )
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+lapply(list.of.packages, library, character.only = TRUE)
 
 
 data = read.csv("cleaned_data_my_version2.csv")
-data = data[1:10000,]
+data = data[1:100,]
 setwd("./output")
 n = nrow(data)
 #output setting
@@ -17,11 +22,11 @@ nu = 0.09
 tauU = 0.61
 step = 0.01
 taus = seq(nu,tauU,step)
-rq1 =  crq( Surv(utime1,censored1)~sex+age+
+rq1 =  quantreg::crq( survival::Surv(utime1,censored1)~sex+age+
               driving+trasportation+knowledge_dutch+immigrant+
               education,
             data = data , taus = taus , method = 'PengHuang')
-rq2 =  crq( Surv(utime2,censored2)~sex+age2+
+rq2 =  quantreg::crq( survival::Surv(utime2,censored2)~sex+age2+
               driving+trasportation+knowledge_dutch+immigrant+
               education,
             data = data,  taus = taus , method = 'PengHuang')
